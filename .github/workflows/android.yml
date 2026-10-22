@@ -1,26 +1,24 @@
-name: Android CI
-
+name: Build ApkClaw APK
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
+  workflow_dispatch: # ✅ 支持网页手动点按钮启动编译
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: set up JDK 11
-      uses: actions/setup-java@v4
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-        cache: gradle
+      - name: 拉取源码
+        uses: actions/checkout@v4
+      - name: 配置JDK17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: 给gradlew执行权限
+        run: chmod +x ./gradlew
+      - name: 编译Release包
+        run: ./gradlew assembleRelease
+      - name: 上传编译好的APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ApkClaw-Release
+          path: app/build/outputs/apk/release/app-release.apk
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Build with Gradle
-      run: ./gradlew build
